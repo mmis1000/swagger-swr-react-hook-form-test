@@ -1,0 +1,7 @@
+{
+  "port": 3020,
+  "routers": "routers",
+  "hooks": "hooks",
+  "generate-ts-definition": "db.ts",
+  "middlewares": "middlewares"
+}
