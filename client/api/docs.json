@@ -1,0 +1,453 @@
+{
+  "schemes": [],
+  "swagger": "2.0",
+  "info": {
+    "title": "Mini Blog API",
+    "description": "API endpoints for a mini blog services documented on swagger",
+    "contact": {
+      "name": "Desmond Obisi",
+      "email": "info@miniblog.com",
+      "url": "https://github.com/DesmondSanctity/node-js-swagger"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/",
+      "description": "Local server"
+    },
+    {
+      "url": "<your live url here>",
+      "description": "Live server"
+    }
+  ],
+  "definitions": {
+    "ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        }
+      }
+    },
+    "PageObject": {
+      "type": "object",
+      "required": [
+        "current",
+        "size",
+        "total"
+      ],
+      "properties": {
+        "current": {
+          "description": "current",
+          "type": "number"
+        },
+        "size": {
+          "description": "size",
+          "type": "number"
+        },
+        "total": {
+          "description": "total",
+          "type": "number"
+        }
+      }
+    },
+    "LoginResult": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "AddPostRequest": {
+      "type": "object",
+      "required": [
+        "title",
+        "content"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        }
+      }
+    },
+    "PostSimple": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "author"
+      ],
+      "properties": {
+        "id": {
+          "description": "id",
+          "type": "number"
+        },
+        "title": {
+          "description": "title",
+          "type": "string"
+        },
+        "author": {
+          "description": "author",
+          "type": "string"
+        }
+      }
+    },
+    "PostSimpleArray": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PostSimple"
+      }
+    },
+    "PatchPostRequest": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "description": "title",
+          "type": "string"
+        },
+        "content": {
+          "description": "content",
+          "type": "string"
+        }
+      }
+    },
+    "Post": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "content",
+        "author"
+      ],
+      "properties": {
+        "id": {
+          "description": "id",
+          "type": "number"
+        },
+        "title": {
+          "description": "title",
+          "type": "string"
+        },
+        "content": {
+          "description": "content",
+          "type": "string"
+        },
+        "author": {
+          "description": "author",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "paths": {
+    "/login": {
+      "post": {
+        "tags": [
+          "api:User Controller"
+        ],
+        "summary": "Login as an user",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "username",
+                "password"
+              ],
+              "properties": {
+                "username": {
+                  "type": "string",
+                  "default": "johndoe"
+                },
+                "password": {
+                  "type": "string",
+                  "default": "johnDoe20!@"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/LoginResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid username / password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/post/{id}": {
+      "get": {
+        "tags": [
+          "api:Post Controller"
+        ],
+        "summary": "Get post",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Item id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/Post"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid username / password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid username / password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "api:Post Controller"
+        ],
+        "summary": "Delete post",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Item id"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Invalid username / password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid username / password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "api:Post Controller"
+        ],
+        "summary": "Modify post",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Item id"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PatchPostRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Invalid username / password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid username / password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/post": {
+      "post": {
+        "tags": [
+          "Post Controller"
+        ],
+        "summary": "Create a post",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AddPostRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid username / password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Post Controller"
+        ],
+        "summary": "Get posts",
+        "parameters": [
+          {
+            "name": "current",
+            "in": "query",
+            "description": "Page number"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Page size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "page"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/definitions/PostSimpleArray"
+                    },
+                    "page": {
+                      "$ref": "#/definitions/PageObject"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid username / password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "responses": {},
+  "parameters": {},
+  "securityDefinitions": {},
+  "tags": []
+}

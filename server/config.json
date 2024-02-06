@@ -3,5 +3,6 @@
   "routers": "routers",
   "hooks": "hooks",
   "generate-ts-definition": "db.ts",
-  "middlewares": "middlewares"
+  "middlewares": "middlewares",
+  "watch": true
 }
