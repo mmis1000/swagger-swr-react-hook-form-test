@@ -1,4 +1,8 @@
 {
   "name": "my-workspaces-powered-project",
+  "scripts": {
+    "start:server": "cd server && npm start",
+    "start:client": "cd client && npm run dev"
+  },
   "workspaces": ["server", "client"]
 }
