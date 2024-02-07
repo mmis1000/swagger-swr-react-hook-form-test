@@ -17,7 +17,8 @@ const createApis = () => {
   const clientApis = {
     ...client.post,
     ...client.me,
-    ...client.login
+    ...client.login,
+    ...client.logout,
   }
 
   type clientApisType = typeof clientApis
@@ -114,7 +115,7 @@ const createApis = () => {
     apis[name] = clientApis[name]
   }
 
-  let currentToken: string
+  let currentToken: string | null = null
 
   client.instance.interceptors.request.use((conf) => {
     if (currentToken) {
@@ -125,7 +126,7 @@ const createApis = () => {
 
   return {
     instance: client.instance,
-    setToken: (token: string) => {
+    setToken: (token: string | null) => {
       currentToken = token
     },
     apis,
@@ -142,7 +143,7 @@ export const TokenProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<null | string>(null)
   const data = useMemo(() => ({
     token,
-     setToken
+    setToken
   }), [token])
   return <tokenContext.Provider value={data}>{children}</tokenContext.Provider>
 }

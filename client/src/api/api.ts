@@ -38,6 +38,8 @@ export interface PostSimple {
   title: string;
   /** author */
   author: string;
+  /** editor */
+  editor: string;
 }
 
 export type PostSimpleArray = PostSimple[];
@@ -58,6 +60,8 @@ export interface Post {
   content: string;
   /** author */
   author: string;
+  /** editor */
+  editor?: string;
 }
 
 export interface LoginCreatePayload {
@@ -223,6 +227,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         body: body,
         type: ContentType.Json,
         format: "json",
+        ...params,
+      }),
+  };
+  logout = {
+    /**
+     * No description
+     *
+     * @tags api:User Controller
+     * @name LogoutCreate
+     * @summary Logout as an user
+     * @request POST:/logout
+     */
+    logoutCreate: (params: RequestParams = {}) =>
+      this.request<void, ErrorResponse>({
+        path: `/logout`,
+        method: "POST",
         ...params,
       }),
   };

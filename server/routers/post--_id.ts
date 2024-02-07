@@ -124,6 +124,10 @@ export const types = {
         description: "author",
         type: "string",
       },
+      editor: {
+        description: "editor",
+        type: "string",
+      },
     },
   },
 }
@@ -155,6 +159,8 @@ const handler: RequestHandler = function A (req, res, next) {
     const params: Record<string, string> = {}
     if (req.body.title) params.title = req.body.title
     if (req.body.content) params.content = req.body.content
+    params.editor = req.user?.username ?? ''
+
     if (post) {
       req.app.db.get('__posts').find({ id: Number(req.params.id) }).assign(params).write()
       return res.status(201).end()

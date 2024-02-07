@@ -48,6 +48,14 @@ function App() {
 
   console.log(watch('username')) // watch input value by passing the name of it
   console.log(watch('password')) // watch input value by passing the name of it
+
+  const onLogout = async () => {
+    await apis.apis.logoutCreate()
+    localStorage.removeItem(LOCAL_STORAGE_KEY)
+    setToken(null)
+    apis.setToken(null)
+  }
+
   return (
     <>
       {
@@ -57,12 +65,17 @@ function App() {
             <input defaultValue="username" {...register('username')} />
 
             {/* include validation with required or other standard HTML validation rules */}
-            <input {...register("password", { required: true })} />
+            <input placeholder='hint: password' type='password' {...register("password", { required: true })} />
             {/* errors will return when field validation fails  */}
             {errors.password && <span>This field is required</span>}
 
             <input type="submit" />
           </form>
+        </>
+      }
+      {
+        token && <>
+          <button onClick={onLogout}>Logout</button>
         </>
       }
       {

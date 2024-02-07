@@ -88,7 +88,7 @@ export const types = {
   },
   PostSimple: {
     type: "object",
-    required: ['id', 'title', 'author'],
+    required: ['id', 'title', 'author', 'editor'],
     properties: {
       id: {
         description: "id",
@@ -100,6 +100,10 @@ export const types = {
       },
       author: {
         description: "author",
+        type: "string",
+      },
+      editor: {
+        description: "editor",
         type: "string",
       },
     },
@@ -130,7 +134,8 @@ const handler: RequestHandler = function A (req, res, next) {
       id: Date.now(),
       title,
       content,
-      author: req.user.username
+      author: req.user.username,
+      editor: ''
     }).write()
 
     return res.status(201).end()
@@ -153,7 +158,8 @@ const handler: RequestHandler = function A (req, res, next) {
       data: posts.map(i => ({
         id: i.id,
         title: i.title,
-        author: i.author
+        author: i.author,
+        editor: i.editor,
       })),
       page: {
         current: current,

@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx @mmis1000/json-server-split -c config.json db"
+    "start": "npx @mmis1000/json-server-split -c config.json db",
+    "clear-snapshot": "rm db/*.snapshot.json"
   },
   "author": "",
   "license": "ISC",

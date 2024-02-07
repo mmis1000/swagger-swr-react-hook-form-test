@@ -80,7 +80,8 @@
       "required": [
         "id",
         "title",
-        "author"
+        "author",
+        "editor"
       ],
       "properties": {
         "id": {
@@ -93,6 +94,10 @@
         },
         "author": {
           "description": "author",
+          "type": "string"
+        },
+        "editor": {
+          "description": "editor",
           "type": "string"
         }
       }
@@ -139,6 +144,10 @@
         },
         "author": {
           "description": "author",
+          "type": "string"
+        },
+        "editor": {
+          "description": "editor",
           "type": "string"
         }
       }
@@ -195,6 +204,29 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Invalid username / password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": [
+          "api:User Controller"
+        ],
+        "summary": "Logout as an user",
+        "responses": {
+          "201": {
+            "description": "Created"
           },
           "401": {
             "description": "Invalid username / password",

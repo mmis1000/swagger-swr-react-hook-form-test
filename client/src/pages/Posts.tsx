@@ -50,6 +50,11 @@ const Posts = () => {
       author: {i.author}
       </td>
       <td>
+        {i.editor && <>
+          editor: {i.editor}
+        </>}
+      </td>
+      <td>
       <button onClick={() => removePost(i.id)}>Delete</button>
       <button onClick={() => setViewingPost(i.id)}>Edit</button>
       </td>
