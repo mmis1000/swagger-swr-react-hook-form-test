@@ -3,6 +3,9 @@ import './App.css'
 import { apis, useCurrentToken } from './api/useSwr'
 import Posts from './pages/Posts'
 import { LoginCreatePayload } from './api/api'
+import { useEffect } from 'react'
+
+const LOCAL_STORAGE_KEY = 'token'
 
 function App() {
   const [token, setToken] = useCurrentToken()
@@ -14,16 +17,31 @@ function App() {
     formState: { errors },
   } = useForm<LoginCreatePayload>()
 
+  useEffect(() => {
+    if (localStorage.getItem(LOCAL_STORAGE_KEY)) {
+      const controller = new AbortController()
+      const signal = controller.signal
+
+      apis.apis.getMe({signal, headers: {
+        Authorization: 'bearer ' + localStorage.getItem(LOCAL_STORAGE_KEY)
+      }}).then(() => {
+        setToken(localStorage.getItem(LOCAL_STORAGE_KEY))
+        apis.setToken(localStorage.getItem(LOCAL_STORAGE_KEY)!)
+      })
+
+      return () => {
+        controller.abort()
+      }
+    }
+  })
+
   const onSubmit: SubmitHandler<LoginCreatePayload> = async (data) => {
     if (data.username && data.password) {
       const res = await apis.apis.loginCreate(data)
-
       if (res.data.token) {
+        localStorage.setItem(LOCAL_STORAGE_KEY, res.data.token)
         setToken(res.data.token)
-        apis.instance.interceptors.request.use((conf) => {
-          conf.headers.Authorization = 'bearer ' + res.data.token
-          return conf
-        })
+        apis.setToken(localStorage.getItem(LOCAL_STORAGE_KEY)!)
       }
     }
   }

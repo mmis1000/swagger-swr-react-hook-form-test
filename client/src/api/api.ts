@@ -226,6 +226,28 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ...params,
       }),
   };
+  me = {
+    /**
+     * No description
+     *
+     * @tags api:User Controller
+     * @name GetMe
+     * @summary get user info
+     * @request GET:/me
+     */
+    getMe: (params: RequestParams = {}) =>
+      this.request<
+        {
+          username: string;
+        },
+        ErrorResponse
+      >({
+        path: `/me`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+  };
   post = {
     /**
      * No description

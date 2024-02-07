@@ -16,6 +16,7 @@ const createApis = () => {
 
   const clientApis = {
     ...client.post,
+    ...client.me,
     ...client.login
   }
 
@@ -113,8 +114,20 @@ const createApis = () => {
     apis[name] = clientApis[name]
   }
 
+  let currentToken: string
+
+  client.instance.interceptors.request.use((conf) => {
+    if (currentToken) {
+      conf.headers.Authorization = 'bearer ' + currentToken
+    }
+    return conf
+  })
+
   return {
     instance: client.instance,
+    setToken: (token: string) => {
+      currentToken = token
+    },
     apis,
   }
 }

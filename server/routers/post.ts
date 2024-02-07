@@ -150,7 +150,11 @@ const handler: RequestHandler = function A (req, res, next) {
     const posts = req.app.db.get('__posts').slice(postStart, postStart + pageSize).value()
 
     return res.json({
-      data: posts,
+      data: posts.map(i => ({
+        id: i.id,
+        title: i.title,
+        author: i.author
+      })),
       page: {
         current: current,
         size: pageSize,

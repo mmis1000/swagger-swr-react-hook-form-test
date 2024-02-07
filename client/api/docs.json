@@ -209,6 +209,44 @@
         }
       }
     },
+    "/me": {
+      "get": {
+        "tags": [
+          "api:User Controller"
+        ],
+        "summary": "get user info",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "username"
+                  ],
+                  "properties": {
+                    "username": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid username / password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/post/{id}": {
       "get": {
         "tags": [

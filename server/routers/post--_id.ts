@@ -154,7 +154,7 @@ const handler: RequestHandler = function A (req, res, next) {
     const post = req.app.db.get('__posts').find({ id: Number(req.params.id) }).value()
     const params: Record<string, string> = {}
     if (req.body.title) params.title = req.body.title
-    if (req.body.content) params.title = req.body.content
+    if (req.body.content) params.content = req.body.content
     if (post) {
       req.app.db.get('__posts').find({ id: Number(req.params.id) }).assign(params).write()
       return res.status(201).end()

@@ -66,12 +66,12 @@ const handler: RequestHandler = function A (req, res) {
   }).value()
 
   if (matchedUser) {
+    console.log('login')
     const token = Math.random().toString(16).slice(2) + '.' + Math.random().toString(16).slice(2) + '.' + Math.random().toString(16).slice(2)
     req.app.db.get('__sessions').push({
       user: matchedUser.username,
       token: token
-    })
-    req.app.db.write()
+    }).write()
     return res.json({
       token: token
     })
