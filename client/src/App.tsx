@@ -4,18 +4,33 @@ import { apis, useCurrentToken } from './api/useSwr'
 import Posts from './pages/Posts'
 import { LoginCreatePayload } from './api/api'
 import { useEffect } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button, Form, Input } from 'antd'
+import { FormItem } from 'react-hook-form-antd'
+import { useOpenNotification } from './utils/useOpenNotification'
+
 
 const LOCAL_STORAGE_KEY = 'token'
 
+
 function App() {
+  const  { openNotification, contextHolder } = useOpenNotification()
+  
   const [token, setToken] = useCurrentToken()
 
+  const schema = z.object({
+    username: z.string().min(1, { message: 'Required' }),
+    password: z.string().min(1, { message: 'Required' }),
+  });
+
   const {
-    register,
+    control,
     handleSubmit,
     watch,
-    formState: { errors },
-  } = useForm<LoginCreatePayload>()
+  } = useForm<LoginCreatePayload>({
+    resolver: zodResolver(schema),
+  })
 
   useEffect(() => {
     if (localStorage.getItem(LOCAL_STORAGE_KEY)) {
@@ -37,11 +52,15 @@ function App() {
 
   const onSubmit: SubmitHandler<LoginCreatePayload> = async (data) => {
     if (data.username && data.password) {
-      const res = await apis.apis.loginCreate(data)
-      if (res.data.token) {
-        localStorage.setItem(LOCAL_STORAGE_KEY, res.data.token)
-        setToken(res.data.token)
-        apis.setToken(localStorage.getItem(LOCAL_STORAGE_KEY)!)
+      try {
+        const res = await apis.apis.loginCreate(data)
+        if (res.data.token) {
+          localStorage.setItem(LOCAL_STORAGE_KEY, res.data.token)
+          setToken(res.data.token)
+          apis.setToken(localStorage.getItem(LOCAL_STORAGE_KEY)!)
+        }
+      } catch (err) {
+        openNotification('top', String(err))
       }
     }
   }
@@ -58,24 +77,33 @@ function App() {
 
   return (
     <>
+      {contextHolder}
       {
         token == null && <>
-          <form onSubmit={handleSubmit(onSubmit)}>
+        <Form
+          style={{ maxWidth: 600 }}
+          onFinish={handleSubmit(onSubmit)}
+        >
             {/* register your input into the hook by invoking the "register" function */}
-            <input defaultValue="username" {...register('username')} />
+            <FormItem control={control} name="username" label="Username">
+              <Input />
+            </FormItem>
 
-            {/* include validation with required or other standard HTML validation rules */}
-            <input placeholder='hint: password' type='password' {...register("password", { required: true })} />
-            {/* errors will return when field validation fails  */}
-            {errors.password && <span>This field is required</span>}
+            <FormItem control={control} name="password" label="Password">
+              <Input.Password />
+            </FormItem>
 
-            <input type="submit" />
-          </form>
+            <Form.Item>
+              <Button type="primary" htmlType="submit">
+                Submit
+              </Button>
+            </Form.Item>
+          </Form>
         </>
       }
       {
         token && <>
-          <button onClick={onLogout}>Logout</button>
+          <Button onClick={onLogout}>Logout</Button>
         </>
       }
       {

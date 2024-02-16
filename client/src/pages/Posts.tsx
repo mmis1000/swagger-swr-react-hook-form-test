@@ -1,21 +1,15 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { apis } from "../api/useSwr"
 import PostCreatePopup from "../components/PostCreatePopup"
 import PostViewPopup from "../components/PostViewEdit"
-import { PatchPostRequest } from "../api/api"
+import { PatchPostRequest, PostSimple } from "../api/api"
+import { Button, Space, Table, TableProps } from "antd"
+import { ColumnsType } from "antd/es/table"
 
 const Posts = () => {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const { data, mutate } = apis.apis.use_postList({ current: page, pageSize })
-
-  const hasNextPage = data != null && data.page.size * (data.page.current) < data.page.total
-  const hasPrevPage = data != null && page > 1
-
-  const changePageSize = (size: number) => {
-    setPage(1)
-    setPageSize(size)
-  }
+  const { data, mutate, isLoading, isValidating } = apis.apis.use_postList({ current: page, pageSize })
 
   const removePost = async (id: number) => {
     await apis.apis.postDelete(id)
@@ -38,35 +32,68 @@ const Posts = () => {
   const [createVisible, setCreateVisible] = useState(false)
   const [viewingPost, setViewingPost] = useState<number | null>(null)
 
+  const columns: ColumnsType<PostSimple> = [
+    {
+      title: 'title',
+      dataIndex: 'title',
+      key: 'title',
+    },
+    {
+      title: 'author',
+      dataIndex: 'author',
+      key: 'author',
+    },
+    {
+      title: 'editor',
+      dataIndex: 'editor',
+      key: 'editor',
+    },
+    {
+      title: 'operation',
+      dataIndex: 'operation',
+      render: (_, record) => {
+        return <Space>
+          <Button onClick={() => removePost(record.id)}>Delete</Button>
+          <Button onClick={() => setViewingPost(record.id)}>Edit</Button>
+        </Space>
+      },
+    },
+  ];
+
+  const handleTableChange: TableProps['onChange'] = (pagination) => {
+    setPageSize(pagination.pageSize ?? pageSize)
+    if (pagination.pageSize && pagination.pageSize !== pageSize) {
+      setPage(1)
+    } else {
+      setPage(pagination.current ?? page)
+    }
+  };
+
+  const tableParams = useMemo(() => data ? ({
+    pagination: {
+      current: data.page.current,
+      pageSize: data.page.size,
+      total: data.page.total
+    },
+  }) : {
+    pagination: {
+      current: 1,
+      pageSize: pageSize,
+      total: 0
+    }
+  }, [data, pageSize])
+
   return <>
-    <button onClick={() => (setCreateVisible(true))}>Add post</button>
-    <table>
-    <tbody>
-    {data?.data?.map(i => <tr key={i.id}>
-      <td>
-      title: {i.title}
-      </td>
-      <td>
-      author: {i.author}
-      </td>
-      <td>
-        {i.editor && <>
-          editor: {i.editor}
-        </>}
-      </td>
-      <td>
-      <button onClick={() => removePost(i.id)}>Delete</button>
-      <button onClick={() => setViewingPost(i.id)}>Edit</button>
-      </td>
-    </tr>)}
-    </tbody>
-    </table>
-    {hasPrevPage && <button onClick={() => setPage(page - 1)}>prev</button>}
-    {hasNextPage && <button onClick={() => setPage(page + 1)}>next</button>}
-    <br />
-    <button onClick={() => changePageSize(10)}>10/page</button>
-    <button onClick={() => changePageSize(30)}>30/page</button>
-    <button onClick={() => changePageSize(50)}>50/page</button>
+    <Button onClick={() => (setCreateVisible(true))}>Add post</Button>
+    <Table
+      dataSource={data?.data}
+      columns={columns}
+      rowKey={(i) => i.id}
+      pagination={tableParams.pagination}
+      loading={isLoading || isValidating}
+
+      onChange={handleTableChange}
+    />
     {createVisible && <PostCreatePopup onClose={() => setCreateVisible(false)} onPostAdd={onPostAdd} />}
     {viewingPost != null && <PostViewPopup id={viewingPost} onClose={() => setViewingPost(null)} onPostEdit={onPostEdit} />}
   </>

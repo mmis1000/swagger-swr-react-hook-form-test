@@ -1,18 +1,27 @@
 import { SubmitHandler, useForm } from "react-hook-form"
 import { AddPostRequest } from "../api/api"
 import { apis } from "../api/useSwr"
+import { Form, Input, Modal } from "antd"
+import { FormItem } from "react-hook-form-antd"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 const PostCreatePopup = ({
   onClose = () => {},
   onPostAdd = () => {}
 }) => {
+  const schema = z.object({
+    title: z.string().min(1, { message: 'Required' }),
+    content: z.string().min(1, { message: 'Required' }),
+  });
 
   const {
-    register,
+    control,
     handleSubmit,
     watch,
-    formState: { errors },
-  } = useForm<AddPostRequest>()
+  } = useForm<AddPostRequest>({
+    resolver: zodResolver(schema)
+  })
 
 
   const onSubmit: SubmitHandler<AddPostRequest> = async (data) => {
@@ -25,16 +34,19 @@ const PostCreatePopup = ({
   watch('title')
   watch('content')
 
-  return <div className="create-post">
-    <button onClick={onClose}>Close</button><br />
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <input defaultValue="" {...register('title', {required: true})} /><br />
-      {errors.title && <span>This field is required</span>}<br />
-      <textarea defaultValue="" {...register('content', {required: true})} /><br />
-      {errors.content && <span>This field is required</span>}<br />
-      <button type="submit">create</button>
-    </form>
-  </div>
+  return <Modal title="Create Post" open={true} onOk={handleSubmit(onSubmit)} onCancel={onClose} >
+  <Form
+    style={{ maxWidth: 600 }}
+    onFinish={handleSubmit(onSubmit)}
+  >
+    <FormItem control={control} name="title" label="title">
+      <Input />
+    </FormItem>
+    <FormItem control={control} name="content" label="content">
+      <Input.TextArea />
+    </FormItem>
+    </Form>
+  </Modal>
 }
 
 export default PostCreatePopup

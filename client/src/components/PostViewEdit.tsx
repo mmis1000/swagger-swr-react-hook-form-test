@@ -1,7 +1,11 @@
 import { SubmitHandler, useForm } from "react-hook-form"
 import { PatchPostRequest } from "../api/api"
 import { apis } from "../api/useSwr"
-
+import { Form, Input, Modal } from "antd"
+import { FormItem } from "react-hook-form-antd"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect } from "react"
 const PostViewPopup = ({
   id,
   onClose = () => { },
@@ -11,14 +15,27 @@ const PostViewPopup = ({
   onClose: () => void,
   onPostEdit: (id: number, newContent: PatchPostRequest) => void
 }) => {
+  const { data, mutate } = apis.apis.use_postDetail(id)
+
+  const schema = z.object({
+    title: z.string().min(1, { message: 'Required' }),
+    content: z.string().min(1, { message: 'Required' }),
+  });
 
   const {
-    register,
+    control,
     handleSubmit,
     watch,
-    formState: { errors },
-  } = useForm<PatchPostRequest>()
+    reset,
+  } = useForm<PatchPostRequest>({
+    resolver: zodResolver(schema)
+  })
 
+  useEffect(() => {
+    if (data) {
+      reset(data);
+    }
+  }, [data, reset]);
 
   const onSubmit: SubmitHandler<PatchPostRequest> = async (data) => {
     if (data.title && data.content) {
@@ -32,24 +49,25 @@ const PostViewPopup = ({
   watch('title')
   watch('content')
 
-  const { data, mutate } = apis.apis.use_postDetail(id)
-
-  return <div className="view-post">
-    <button onClick={onClose}>Close</button><br />
+  return <Modal title="Edit Post" open={true} onOk={handleSubmit(onSubmit)} onCancel={onClose} >
     {
       data &&
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <input defaultValue={data.title} {...register('title', { required: true })} /> <br />
-        {errors.title && <span>This field is required</span>} <br />
-        <textarea defaultValue={data.content} {...register('content', { required: true })} /> <br />
-        {errors.content && <span>This field is required</span>} <br />
-        <button type="submit">edit</button>
-      </form>
+      <Form
+        style={{ maxWidth: 600 }}
+        onFinish={handleSubmit(onSubmit)}
+      >
+        <FormItem control={control} name="title" label="title">
+          <Input />
+        </FormItem>
+        <FormItem control={control} name="content" label="content">
+          <Input.TextArea />
+        </FormItem>
+      </Form>
     }
     {
       data == null && <div>Loading...</div>
     }
-  </div>
+  </Modal>
 }
 
 export default PostViewPopup
